@@ -19,6 +19,5 @@ fn clear() !void {
         allocator.free(result.stderr);
     }
 
-    //std.log.info("stdout: {s}", .{result.stdout});
     _ = try std.io.getStdOut().writer().write(result.stdout);
 }
