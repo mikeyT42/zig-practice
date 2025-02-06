@@ -1,13 +1,11 @@
 const std = @import("std");
 const stdout = std.io.getStdOut().writer();
 
-const string_len: i8 = 100;
-
 const Book = struct {
     year: u16,
     genre: Genre,
-    title: [string_len]u8,
-    author: [string_len]u8,
+    title: []const u8,
+    author: []const u8,
 };
 
 const Genre = enum {
@@ -27,6 +25,54 @@ pub fn main() !void {
         \\
         \\
     );
+
+    const library = [_]Book{
+        .{
+            .title = "The Great Gatsby",
+            .author = "F. Scott Fitzgerald",
+            .genre = Genre.fiction,
+            .year = 1925,
+        },
+        .{
+            .title = "Harry Potter and the Sorcer's Stone",
+            .author = "J. K. Rowling",
+            .genre = Genre.fiction,
+            .year = 1997,
+        },
+        .{
+            .title = "The War of the Worlds",
+            .author = "H. G. Wells",
+            .genre = Genre.science_fiction,
+            .year = 1898,
+        },
+        .{
+            .title = "Sherlock Holmes",
+            .author = "Arthur Conan Doyle",
+            .genre = Genre.mystery,
+            .year = 1892,
+        },
+        .{
+            .title = "Steve Jobs",
+            .author = "Arthur Isaacson",
+            .genre = Genre.biography,
+            .year = 2011,
+        },
+        .{
+            .title = "Philosophiae Naturalis Principia Mathematica",
+            .author = "Sir Isaac Newton",
+            .genre = Genre.non_fiction,
+            .year = 1687,
+        },
+    };
+
+    _ = try stdout.print("Our library has {d} books.\n\n", .{library.len});
+
+    try print_book(library[0]);
+    try print_book(library[1]);
+    try print_book(library[2]);
+    try print_book(library[3]);
+    try print_book(library[4]);
+    try print_book(library[5]);
 
     _ = try stdout.write(
         \\------------------------------------------------------------------------------------------
@@ -62,10 +108,10 @@ test genre_to_string {
         .genre = Genre.mystery,
         .year = 1892,
     };
-    std.testing.expect(std.mem.eql(u8, genre_to_string(b), "Mystery"));
+    try std.testing.expect(std.mem.eql(u8, genre_to_string(b), "Mystery"));
 }
 
-fn genre_to_string(book: Book) []u8 {
+fn genre_to_string(book: Book) []const u8 {
     return switch (book.genre) {
         .fiction => "Fiction",
         .non_fiction => "Non-fiction",
@@ -76,4 +122,13 @@ fn genre_to_string(book: Book) []u8 {
 }
 
 // -------------------------------------------------------------------------------------------------
-//fn print_book(book: Book) []u8 {}
+fn print_book(book: Book) !void {
+    _ = try stdout.print(
+        \\book {
+        \\  title = {s}
+        \\  author = {s}
+        \\  year = {d}
+        \\  genre = {s}
+        \\}
+    , .{ book.title, book.author, book.year, genre_to_string(book) });
+}
