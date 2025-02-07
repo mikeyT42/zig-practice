@@ -1,5 +1,6 @@
 const std = @import("std");
 const stdout = std.io.getStdOut().writer();
+const stdin = std.io.getStdIn().reader();
 
 const LoopControl = enum {
     again,
