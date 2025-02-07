@@ -124,11 +124,12 @@ fn genre_to_string(book: Book) []const u8 {
 // -------------------------------------------------------------------------------------------------
 fn print_book(book: Book) !void {
     _ = try stdout.print(
-        \\book {
+        \\book [
         \\  title = {s}
         \\  author = {s}
         \\  year = {d}
         \\  genre = {s}
-        \\}
+        \\]
+        \\
     , .{ book.title, book.author, book.year, genre_to_string(book) });
 }
