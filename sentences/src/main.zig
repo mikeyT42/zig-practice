@@ -49,4 +49,14 @@ fn clear() !void {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn input_loop() !LoopControl {}
+fn input_loop() !LoopControl {
+    const buf_size = comptime 250;
+    const sentinel = comptime '\n';
+
+    var input_buf: [buf_size]u8 = undefined;
+
+    _ = try stdout.write("\n\nPlease input a sentence. If you want to exit, just hit enter.\n");
+    _ = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
+
+    return LoopControl.again;
+}
