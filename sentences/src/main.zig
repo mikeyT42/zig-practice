@@ -23,6 +23,7 @@ pub fn main() !void {
     }
 
     _ = try stdout.write(
+        \\
         \\------------------------------------------------------------------------------------------
         \\                                          Goodbye 
         \\------------------------------------------------------------------------------------------
@@ -56,7 +57,43 @@ fn input_loop() !LoopControl {
     var input_buf: [buf_size]u8 = undefined;
 
     _ = try stdout.write("\n\nPlease input a sentence. If you want to exit, just hit enter.\n");
-    _ = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
+    const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
+    if (line.?.len <= 0)
+        return LoopControl.stop;
+
+    const input = line.?;
+    const total_keystrokes = keystrokes(input);
+    _ = try stdout.print("\nKeystrokes: {d: <10}", .{total_keystrokes});
+    const total_alpha = alpha_chars(input);
+    _ = try stdout.print("\nAlpha Characters: {d: <4}", .{total_alpha});
 
     return LoopControl.again;
+}
+
+// -------------------------------------------------------------------------------------------------
+fn keystrokes(input: []const u8) u8 {
+    // This is me assuming input.len will fit into u8.
+    return @intCast(input.len);
+}
+
+test keystrokes {
+    _ = try std.testing.expectEqual(keystrokes(@as([]const u8, "Hello there 12.")), 15);
+}
+
+// -------------------------------------------------------------------------------------------------
+fn alpha_chars(input: []const u8) u8 {
+    var total_alpha: u8 = 0;
+
+    for (input) |char| {
+        if (!std.ascii.isAlphabetic(char))
+            continue;
+
+        total_alpha += 1;
+    }
+
+    return total_alpha;
+}
+
+test alpha_chars {
+    _ = try std.testing.expectEqual(alpha_chars(@as([]const u8, "Hello there 12.")), 10);
 }
