@@ -63,9 +63,13 @@ fn input_loop() !LoopControl {
 
     const input = line.?;
     const total_keystrokes = keystrokes(input);
-    _ = try stdout.print("\nKeystrokes: {d: <10}", .{total_keystrokes});
+    _ = try stdout.print("\nKeystrokes: {d: <20}", .{total_keystrokes});
     const total_alpha = alpha_chars(input);
-    _ = try stdout.print("\nAlpha Characters: {d: <4}", .{total_alpha});
+    _ = try stdout.print("\nAlpha Characters: {d: <20}", .{total_alpha});
+    const total_digit = digit_chars(input);
+    _ = try stdout.print("\nNumeric Characters: {d: <20}", .{total_digit});
+    const total_vowels = vowels(input);
+    _ = try stdout.print("\nVowels: {d: <20}", .{total_vowels});
 
     return LoopControl.again;
 }
@@ -116,4 +120,25 @@ fn digit_chars(input: []const u8) u8 {
 
 test digit_chars {
     _ = try std.testing.expectEqual(digit_chars(@as([]const u8, "Hello there 12.")), 2);
+}
+
+// -------------------------------------------------------------------------------------------------
+fn vowels(input: []const u8) u8 {
+    var total_vowels: u8 = 0;
+
+    for (input) |char| {
+        if (!std.ascii.isAlphabetic(char))
+            continue;
+
+        switch (char) {
+            'a', 'A', 'e', 'E', 'i', 'I', 'o', 'O', 'u', 'U' => total_vowels += 1,
+            else => {},
+        }
+    }
+
+    return total_vowels;
+}
+
+test vowels {
+    _ = try std.testing.expectEqual(vowels(@as([]const u8, "Hello there 12.")), 4);
 }
