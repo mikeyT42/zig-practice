@@ -97,3 +97,23 @@ fn alpha_chars(input: []const u8) u8 {
 test alpha_chars {
     _ = try std.testing.expectEqual(alpha_chars(@as([]const u8, "Hello there 12.")), 10);
 }
+
+// -------------------------------------------------------------------------------------------------
+fn digit_chars(input: []const u8) u8 {
+    var total_digit: u8 = 0;
+
+    for (input) |char| {
+        if (!std.ascii.isAlphanumeric(char))
+            continue;
+        if (std.ascii.isAlphabetic(char))
+            continue;
+        // Only thing left is that char is numeric.
+        total_digit += 1;
+    }
+
+    return total_digit;
+}
+
+test digit_chars {
+    _ = try std.testing.expectEqual(digit_chars(@as([]const u8, "Hello there 12.")), 2);
+}
