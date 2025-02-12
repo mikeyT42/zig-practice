@@ -75,6 +75,6 @@ fn validate(input: []const u8) InputValidation {
     const cost_input = std.fmt.parseFloat(f16, input) catch |err| return .{ .input_error = err };
     if (cost_input == sentinel)
         return .{.no_input};
-    if (cost_input < 0 || cost_input > 1)}
+    if (cost_input < 0 || cost_input > 1)
         return .{ .no_input };
 }
