@@ -7,7 +7,12 @@ const LoopControl = enum {
     stop,
 };
 
-const InputValidation = union(enum) { out_of_range: void, no_input: void, input_error: std.fmt.ParseFloatError };
+const InputValidation = union(enum) {
+    ok: f16,
+    out_of_range: void,
+    no_input: void,
+    input_error: std.fmt.ParseFloatError,
+};
 
 pub fn main() !void {
     try clear();
@@ -63,8 +68,24 @@ fn input_loop() !LoopControl {
         \\
     );
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
-    if (line.?.len == 0)
-        return LoopControl.stop;
+
+    const input_cost = switch (validate(line)) {
+        InputValidation.no_input => {
+            _ = try stdout.write("Sorry, but you didn't enter any input. Please try again.");
+            return LoopControl.again;
+        },
+        InputValidation.out_of_range => {
+            _ = try stdout.print("You input {s}, a value that is not between 0 and 1.", .{line});
+            return LoopControl.again;
+        },
+        InputValidation.input_error => |err| {
+            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}", .{line, err});
+            return LoopControl.again;
+        },
+        InputValidation.ok => |parsed_input| parsed_input,
+    };
+
+    return LoopControl.again;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -74,7 +95,9 @@ fn validate(input: []const u8) InputValidation {
         return .{.no_input};
     const cost_input = std.fmt.parseFloat(f16, input) catch |err| return .{ .input_error = err };
     if (cost_input == sentinel)
-        return .{.no_input};
-    if (cost_input < 0 || cost_input > 1)
-        return .{ .no_input };
+        return .{.ok = cost_input};
+    if (cost_input < 0 or cost_input > 1)
+        return .{.out_of_range};
+
+    return .{.ok = cost_input};
 }
