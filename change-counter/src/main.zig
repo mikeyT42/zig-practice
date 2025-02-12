@@ -7,6 +7,8 @@ const LoopControl = enum {
     stop,
 };
 
+const InputValidation = union(enum) { out_of_range: void, no_input: void, input_error: std.fmt.ParseFloatError };
+
 pub fn main() !void {
     try clear();
     _ = try stdout.write(
@@ -63,4 +65,16 @@ fn input_loop() !LoopControl {
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
     if (line.?.len == 0)
         return LoopControl.stop;
+}
+
+// -------------------------------------------------------------------------------------------------
+fn validate(input: []const u8) InputValidation {
+    const sentinel = comptime -1;
+    if (input.len == 0)
+        return .{.no_input};
+    const cost_input = std.fmt.parseFloat(f16, input) catch |err| return .{ .input_error = err };
+    if (cost_input == sentinel)
+        return .{.no_input};
+    if (cost_input < 0 || cost_input > 1)}
+        return .{ .no_input };
 }
