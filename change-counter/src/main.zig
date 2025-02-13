@@ -69,7 +69,7 @@ fn input_loop() !LoopControl {
     );
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
 
-    const input_cost = switch (validate(line)) {
+    const input_cost: f16 = switch (validate(line)) {
         InputValidation.no_input => {
             _ = try stdout.write("Sorry, but you didn't enter any input. Please try again.");
             return LoopControl.again;
@@ -79,11 +79,20 @@ fn input_loop() !LoopControl {
             return LoopControl.again;
         },
         InputValidation.input_error => |err| {
-            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}", .{line, err});
+            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}", .{ line, err });
             return LoopControl.again;
         },
         InputValidation.ok => |parsed_input| parsed_input,
     };
+
+    var num_quarters: i8 = undefined;
+    var num_dimes: i8 = undefined;
+    var num_nickels: i8 = undefined;
+    var num_pennies: i8 = undefined;
+    calculate_change(&input_cost, &num_quarters, &num_dimes, &num_nickels, &num_pennies);
+
+    stdout.print("\nThe amount you gave was ${d}, your change is {d} Quarters, {d} Dimes,\n" +
+        "{d} Nickels, and {d} Pennies.\n\n", .{ input_cost, num_quarters, num_dimes, num_nickels, num_pennies });
 
     return LoopControl.again;
 }
@@ -95,9 +104,23 @@ fn validate(input: []const u8) InputValidation {
         return .{.no_input};
     const cost_input = std.fmt.parseFloat(f16, input) catch |err| return .{ .input_error = err };
     if (cost_input == sentinel)
-        return .{.ok = cost_input};
+        return .{ .ok = cost_input };
     if (cost_input < 0 or cost_input > 1)
         return .{.out_of_range};
 
-    return .{.ok = cost_input};
+    return .{ .ok = cost_input };
+}
+
+// -------------------------------------------------------------------------------------------------
+fn calculate_change(input_cost: *const f16, num_quarters: *i8, num_dimes: *i8, num_nickels: *i8, num_pennies: *i8) void {
+    const cost_cents: i8 = input_cost.* * 100;
+    var change: i8 = cost_cents;
+
+    num_quarters.* = change / 25;
+    change %= 25;
+    num_dimes.* = change / 10;
+    change %= 10;
+    num_nickels.* = change / 5;
+    change %= 5;
+    num_pennies.* = change;
 }
