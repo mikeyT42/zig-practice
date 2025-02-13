@@ -59,7 +59,8 @@ fn clear() !void {
 // -------------------------------------------------------------------------------------------------
 fn input_loop() !LoopControl {
     const buf_size = comptime 250;
-    const sentinel = comptime '\n';
+    const delimiter = comptime '\n';
+    const sentinel = comptime -1;
     var input_buf: [buf_size]u8 = undefined;
 
     _ = try stdout.write(
@@ -67,23 +68,25 @@ fn input_loop() !LoopControl {
         \\to exit.
         \\
     );
-    const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
+    const line = try stdin.readUntilDelimiterOrEof(&input_buf, delimiter);
 
     const input_cost: f16 = switch (validate(line)) {
         InputValidation.no_input => {
-            _ = try stdout.write("Sorry, but you didn't enter any input. Please try again.");
+            _ = try stdout.write("Sorry, but you didn't enter any input. Please try again.\n\n");
             return LoopControl.again;
         },
         InputValidation.out_of_range => {
-            _ = try stdout.print("You input {s}, a value that is not between 0 and 1.", .{line.?});
+            _ = try stdout.print("You input {s}, a value that is not between 0 and 1.\n\n", .{line.?});
             return LoopControl.again;
         },
         InputValidation.input_error => |err| {
-            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}", .{ line.?, err });
+            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}\n\n", .{ line.?, err });
             return LoopControl.again;
         },
         InputValidation.ok => |parsed_input| parsed_input,
     };
+    if (input_cost == sentinel)
+        return LoopControl.stop;
 
     var num_quarters: u8 = undefined;
     var num_dimes: u8 = undefined;
