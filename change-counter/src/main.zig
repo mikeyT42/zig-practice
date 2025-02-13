@@ -75,46 +75,53 @@ fn input_loop() !LoopControl {
             return LoopControl.again;
         },
         InputValidation.out_of_range => {
-            _ = try stdout.print("You input {s}, a value that is not between 0 and 1.", .{line});
+            _ = try stdout.print("You input {s}, a value that is not between 0 and 1.", .{line.?});
             return LoopControl.again;
         },
         InputValidation.input_error => |err| {
-            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}", .{ line, err });
+            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}", .{ line.?, err });
             return LoopControl.again;
         },
         InputValidation.ok => |parsed_input| parsed_input,
     };
 
-    var num_quarters: i8 = undefined;
-    var num_dimes: i8 = undefined;
-    var num_nickels: i8 = undefined;
-    var num_pennies: i8 = undefined;
+    var num_quarters: u8 = undefined;
+    var num_dimes: u8 = undefined;
+    var num_nickels: u8 = undefined;
+    var num_pennies: u8 = undefined;
     calculate_change(&input_cost, &num_quarters, &num_dimes, &num_nickels, &num_pennies);
 
-    stdout.print("\nThe amount you gave was ${d}, your change is {d} Quarters, {d} Dimes,\n" +
-        "{d} Nickels, and {d} Pennies.\n\n", .{ input_cost, num_quarters, num_dimes, num_nickels, num_pennies });
+    _ = try stdout.print(
+        \\
+        \\The amount you gave was ${d}, your change is {d} Quarters, {d} Dimes,
+        \\{d} Nickels, and {d} Pennies.
+        \\
+        \\
+    , .{ input_cost, num_quarters, num_dimes, num_nickels, num_pennies });
 
     return LoopControl.again;
 }
 
 // -------------------------------------------------------------------------------------------------
-fn validate(input: []const u8) InputValidation {
+fn validate(optional_input: ?[]const u8) InputValidation {
     const sentinel = comptime -1;
-    if (input.len == 0)
-        return .{.no_input};
-    const cost_input = std.fmt.parseFloat(f16, input) catch |err| return .{ .input_error = err };
-    if (cost_input == sentinel)
-        return .{ .ok = cost_input };
-    if (cost_input < 0 or cost_input > 1)
-        return .{.out_of_range};
 
-    return .{ .ok = cost_input };
+    const input: []const u8 = optional_input orelse return InputValidation.no_input;
+    if (input.len == 0)
+        return InputValidation.no_input;
+    const cost_input = std.fmt.parseFloat(f16, input) catch |err| return InputValidation{ .input_error = err };
+    if (cost_input == sentinel)
+        return InputValidation{ .ok = cost_input };
+    if (cost_input < 0 or cost_input > 1)
+        return InputValidation.out_of_range;
+
+    return InputValidation{ .ok = cost_input };
 }
 
 // -------------------------------------------------------------------------------------------------
-fn calculate_change(input_cost: *const f16, num_quarters: *i8, num_dimes: *i8, num_nickels: *i8, num_pennies: *i8) void {
-    const cost_cents: i8 = input_cost.* * 100;
-    var change: i8 = cost_cents;
+fn calculate_change(input_cost: *const f16, num_quarters: *u8, num_dimes: *u8, num_nickels: *u8, num_pennies: *u8) void {
+    const cost_cents: u8 = @intFromFloat(input_cost.* * 100);
+    var change: u8 = cost_cents;
 
     num_quarters.* = change / 25;
     change %= 25;
