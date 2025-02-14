@@ -20,6 +20,8 @@ const Averages = struct {
     overall: f32,
 };
 
+const InputValidation = union(enum) {};
+
 const LoopControl = enum {
     again,
     stop,
@@ -71,10 +73,16 @@ fn clear() !void {
 fn input_loop() !LoopControl {
     const buf_size = comptime 250;
     const sentinel = comptime '\n';
+    const len_of_items = comptime 10;
 
     var input_buf: [buf_size]u8 = undefined;
 
-    _ = try stdout.write("\n\nPlease input a sentence. If you want to exit, just hit enter.\n");
+    _ = try stdout.print(
+        \\Please input up to {d} floating point or integer numbers. Seperate them with spaces.
+        \\Simply enter a newline character to exit.
+        \\
+        \\
+        , .{len_of_items});
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
     if (line.?.len <= 0)
         return LoopControl.stop;
@@ -83,3 +91,6 @@ fn input_loop() !LoopControl {
 
     return LoopControl.again;
 }
+
+// -------------------------------------------------------------------------------------------------
+fn validate(input: ?[]const u8) InputValidation {}
