@@ -6,7 +6,7 @@ const max_items = 10;
 
 const Sums = struct {
     positive: f32 = 0.0,
-    negatice: f32 = 0.0,
+    negative: f32 = 0.0,
     overall: f32 = 0.0,
 };
 
@@ -91,7 +91,7 @@ fn input_loop() !LoopControl {
     , .{max_items});
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
 
-    const numbers = switch(validate(line)) {
+    const numbers = switch (validate(line)) {
         InputValidation.no_input => {
             _ = try stdout.write("Sorry, but you didn't enter any input. Please try again.\n\n");
             return LoopControl.again;
@@ -110,6 +110,8 @@ fn input_loop() !LoopControl {
     var sums: Sums = .{};
     var counts: Counts = .{};
     var averages: Averages = .{};
+    sum_and_count(numbers, &sums, &counts);
+    average(&sums, &counts, &averages);
 
     return LoopControl.again;
 }
@@ -124,14 +126,16 @@ fn validate(optional_input: ?[]const u8) InputValidation {
         return InputValidation.no_input;
 
     var parsed_nums: [max_items]f16 = undefined;
-    for (nums.next(), 0..) |num, i| {
+    var i: u8 = 0;
+    while (nums.next()) |num| {
         if (i == max_items)
             return InputValidation.too_many;
 
         parsed_nums[i] = std.fmt.parseFloat(f16, num) catch |err| return InputValidation{ .input_error = err };
+        i += 1;
     }
 
-    return InputValidation{ .ok = parsed_nums };
+    return InputValidation{ .ok = &parsed_nums };
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -151,21 +155,21 @@ fn sum_and_count(numbers: []const f16, sums: *Sums, counts: *Counts) void {
 
 // -------------------------------------------------------------------------------------------------
 fn average(sums: *const Sums, counts: *const Counts, averages: *Averages) void {
-    if(counts.*.positive == 0) {
+    if (counts.*.positive == 0) {
         averages.*.positive = 0;
     } else {
-        averages.*.positive = sums.*.positive / counts.*.positive;
+        averages.*.positive = @as(f32, sums.*.positive) / @as(f32, @floatFromInt(counts.*.positive));
     }
 
     if (counts.*.negative == 0) {
         averages.*.negative = 0;
     } else {
-        averages.*.negative = sums.*.negative / counts.*.negative;
+        averages.*.negative = @as(f32, sums.*.negative) / @as(f32, @floatFromInt(counts.*.negative));
     }
 
     if (sums.*.overall == 0 or counts.*.overall == 0) {
         averages.*.overall = 0;
     } else {
-        averages.*.overall = sums.*.overall / counts.*.overall;
+        averages.*.overall = @as(f32, sums.*.overall) / @as(f32, @floatFromInt(counts.*.overall));
     }
 }
