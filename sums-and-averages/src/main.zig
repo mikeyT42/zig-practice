@@ -139,6 +139,19 @@ fn validate(optional_input: ?[]const u8) InputValidation {
 }
 
 // -------------------------------------------------------------------------------------------------
+test sum_and_count {
+    var sums: Sums = .{};
+    var counts: Counts = .{};
+    const numbers = [_]f16{ 5.0, -5.0, -5.0, 5.0 };
+    sum_and_count(&numbers, &sums, &counts);
+    _ = try std.testing.expect(sums.positive == 10);
+    _ = try std.testing.expect(sums.negative == -10);
+    _ = try std.testing.expect(sums.overall == 0);
+    _ = try std.testing.expect(counts.positive == 2);
+    _ = try std.testing.expect(counts.negative == 2);
+    _ = try std.testing.expect(counts.overall == 4);
+}
+
 fn sum_and_count(numbers: []const f16, sums: *Sums, counts: *Counts) void {
     for (numbers) |number| {
         if (number >= 0) {
@@ -154,6 +167,16 @@ fn sum_and_count(numbers: []const f16, sums: *Sums, counts: *Counts) void {
 }
 
 // -------------------------------------------------------------------------------------------------
+test average {
+    const sums: Sums = .{ .positive = 10, .negative = -10, .overall = 0 };
+    const counts: Counts = .{ .positive = 2, .negative = 2, .overall = 4 };
+    var averages: Averages = .{};
+    average(&sums, &counts, &averages);
+    _ = try std.testing.expect(averages.positive == 5);
+    _ = try std.testing.expect(averages.negative == -5);
+    _ = try std.testing.expect(averages.overall == 0);
+}
+
 fn average(sums: *const Sums, counts: *const Counts, averages: *Averages) void {
     if (counts.*.positive == 0) {
         averages.*.positive = 0;
