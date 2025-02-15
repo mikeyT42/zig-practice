@@ -196,3 +196,8 @@ fn average(sums: *const Sums, counts: *const Counts, averages: *Averages) void {
         averages.*.overall = @as(f32, sums.*.overall) / @as(f32, @floatFromInt(counts.*.overall));
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+fn print_table(sums: *const Sums, counts: *const Counts, averages: *const Averages) !void {
+
+}
