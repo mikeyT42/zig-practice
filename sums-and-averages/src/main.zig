@@ -93,8 +93,7 @@ fn input_loop() !LoopControl {
 
     const numbers = switch (validate(line)) {
         InputValidation.no_input => {
-            _ = try stdout.write("Sorry, but you didn't enter any input. Please try again.\n\n");
-            return LoopControl.again;
+            return LoopControl.stop;
         },
         InputValidation.too_many => {
             _ = try stdout.print("You input too many numbers, please only input up to {d}.\n\n", .{max_items});
@@ -112,6 +111,7 @@ fn input_loop() !LoopControl {
     var averages: Averages = .{};
     sum_and_count(numbers, &sums, &counts);
     average(&sums, &counts, &averages);
+    _ = try print_table(&sums, &counts, &averages);
 
     return LoopControl.again;
 }
@@ -199,5 +199,13 @@ fn average(sums: *const Sums, counts: *const Counts, averages: *Averages) void {
 
 // -------------------------------------------------------------------------------------------------
 fn print_table(sums: *const Sums, counts: *const Counts, averages: *const Averages) !void {
-
+    _ = try stdout.print(
+        \\  Statistics:
+        \\{s: >18}{s: >16}{s: >14}
+        \\Positive:{d: >9}{d: >16.3}{d: >14.3}
+        \\Negative:{d: >9}{d: >16.3}{d: >14.3}
+        \\Overall:{d: >10}{d: >16.3}{d: >14.3}
+        \\
+        \\
+    , .{ "Number:", "Total:", "Average:", counts.*.positive, sums.*.positive, averages.*.positive, counts.*.negative, sums.*.negative, averages.*.negative, counts.*.overall, sums.*.overall, averages.*.overall });
 }
