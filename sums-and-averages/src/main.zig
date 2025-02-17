@@ -21,7 +21,7 @@ const Averages = struct {
 };
 
 const InputValidation = union(enum) {
-    ok: usize,
+    ok: struct { []f16, usize },
     no_input: void,
     too_many: void,
     input_error: std.fmt.ParseFloatError,
@@ -90,8 +90,8 @@ fn input_loop() !LoopControl {
     , .{max_items});
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
 
-    var numbers: [max_items]f16 = undefined;
-    const len = switch (validate(line, &numbers)) {
+    var numbers_buf: [max_items]f16 = undefined;
+    const numbers: []f16, const len = switch (validate(line, &numbers_buf)) {
         InputValidation.no_input => {
             return LoopControl.stop;
         },
@@ -103,7 +103,7 @@ fn input_loop() !LoopControl {
             _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}\n\n", .{ line.?, err });
             return LoopControl.again;
         },
-        InputValidation.ok => |parsed_len| parsed_len,
+        InputValidation.ok => |parsed_tuple| parsed_tuple,
     };
 
     var sums: Sums = .{};
@@ -126,18 +126,16 @@ fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
     if (nums.peek() == null)
         return InputValidation.no_input;
 
-    var i: u8 = 0;
+    var len: u8 = 0;
     while (nums.next()) |num| {
-        if (i == parsed_nums.len)
+        if (len == parsed_nums.len)
             return InputValidation.too_many;
 
-        parsed_nums[i] = std.fmt.parseFloat(f16, num) catch |err| return InputValidation{ .input_error = err };
-        stdout.print("num = {s}\n", .{num}) catch unreachable;
-        stdout.print("parsed_nums[{d}] = {d}\n", .{ i, parsed_nums[i] }) catch unreachable;
-        i += 1;
+        parsed_nums[len] = std.fmt.parseFloat(f16, num) catch |err| return InputValidation{ .input_error = err };
+        len += 1;
     }
 
-    return InputValidation{ .ok = i };
+    return InputValidation{ .ok = .{ parsed_nums, len } };
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -156,7 +154,6 @@ test sum_and_count {
 
 fn sum_and_count(numbers: []const f16, sums: *Sums, counts: *Counts) void {
     for (numbers) |number| {
-        stdout.print("number = {d}\n", .{number}) catch unreachable;
         if (number >= 0) {
             sums.*.positive += number;
             counts.*.positive += 1;
