@@ -132,9 +132,12 @@ fn validate(optional_input: ?[]const u8) InputValidation {
             return InputValidation.too_many;
 
         parsed_nums[i] = std.fmt.parseFloat(f16, num) catch |err| return InputValidation{ .input_error = err };
+        stdout.print("num = {s}\n", .{num}) catch unreachable;
+        stdout.print("parsed_nums[{d}] = {d}\n", .{ i, parsed_nums[i] }) catch unreachable;
         i += 1;
     }
 
+    // TODO: I cannot do this. I am trying to return a pointer to a stack allocated array.
     return InputValidation{ .ok = &parsed_nums };
 }
 
@@ -154,6 +157,7 @@ test sum_and_count {
 
 fn sum_and_count(numbers: []const f16, sums: *Sums, counts: *Counts) void {
     for (numbers) |number| {
+        stdout.print("number = {d}\n", .{number}) catch unreachable;
         if (number >= 0) {
             sums.*.positive += number;
             counts.*.positive += 1;
