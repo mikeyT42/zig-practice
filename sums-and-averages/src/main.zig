@@ -2,8 +2,6 @@ const std = @import("std");
 const stdout = std.io.getStdOut().writer();
 const stdin = std.io.getStdIn().reader();
 
-const max_items = 10;
-
 const Sums = struct {
     positive: f32 = 0.0,
     negative: f32 = 0.0,
@@ -23,7 +21,7 @@ const Averages = struct {
 };
 
 const InputValidation = union(enum) {
-    ok: []f16,
+    ok: usize,
     no_input: void,
     too_many: void,
     input_error: std.fmt.ParseFloatError,
@@ -80,6 +78,7 @@ fn clear() !void {
 fn input_loop() !LoopControl {
     const buf_size = comptime 250;
     const sentinel = comptime '\n';
+    const max_items = comptime 10;
 
     var input_buf: [buf_size]u8 = undefined;
 
@@ -91,7 +90,8 @@ fn input_loop() !LoopControl {
     , .{max_items});
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
 
-    const numbers = switch (validate(line)) {
+    var numbers: [max_items]f16 = undefined;
+    const len = switch (validate(line, &numbers)) {
         InputValidation.no_input => {
             return LoopControl.stop;
         },
@@ -103,13 +103,13 @@ fn input_loop() !LoopControl {
             _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}\n\n", .{ line.?, err });
             return LoopControl.again;
         },
-        InputValidation.ok => |parsed_numbers| parsed_numbers,
+        InputValidation.ok => |parsed_len| parsed_len,
     };
 
     var sums: Sums = .{};
     var counts: Counts = .{};
     var averages: Averages = .{};
-    sum_and_count(numbers, &sums, &counts);
+    sum_and_count(numbers[0..len], &sums, &counts);
     average(&sums, &counts, &averages);
     _ = try print_table(&sums, &counts, &averages);
 
@@ -117,7 +117,8 @@ fn input_loop() !LoopControl {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn validate(optional_input: ?[]const u8) InputValidation {
+// TODO: Make a test for the validate function.
+fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
     const input: []const u8 = optional_input orelse return InputValidation.no_input;
     if (input.len == 0)
         return InputValidation.no_input;
@@ -125,10 +126,9 @@ fn validate(optional_input: ?[]const u8) InputValidation {
     if (nums.peek() == null)
         return InputValidation.no_input;
 
-    var parsed_nums: [max_items]f16 = undefined;
     var i: u8 = 0;
     while (nums.next()) |num| {
-        if (i == max_items)
+        if (i == parsed_nums.len)
             return InputValidation.too_many;
 
         parsed_nums[i] = std.fmt.parseFloat(f16, num) catch |err| return InputValidation{ .input_error = err };
@@ -137,8 +137,7 @@ fn validate(optional_input: ?[]const u8) InputValidation {
         i += 1;
     }
 
-    // TODO: I cannot do this. I am trying to return a pointer to a stack allocated array.
-    return InputValidation{ .ok = &parsed_nums };
+    return InputValidation{ .ok = i };
 }
 
 // -------------------------------------------------------------------------------------------------
