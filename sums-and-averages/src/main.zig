@@ -91,7 +91,7 @@ fn input_loop() !LoopControl {
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
 
     var numbers_buf: [max_items]f16 = undefined;
-    const numbers: []f16, const len = switch (validate(line, &numbers_buf)) {
+    const numbers: []f16, const len: usize = switch (validate(line, &numbers_buf)) {
         InputValidation.no_input => {
             return LoopControl.stop;
         },
