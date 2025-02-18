@@ -146,7 +146,7 @@ test validate {
     var parsed: [2]f16 = undefined;
     _ = try std.testing.expectEqualDeep(
         InputValidation{ .ok = .{ @constCast(&[_]f16{ 1, 2 }), 2 } },
-        validate("1  2", &parsed),
+        validate("  1  2  ", &parsed),
     );
 }
 
