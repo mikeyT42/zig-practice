@@ -76,11 +76,17 @@ fn input_loop() !LoopControl {
             return LoopControl.again;
         },
         InputValidation.out_of_range => {
-            _ = try stdout.print("You input {s}, a value that is not between 0 and 1.\n\n", .{line.?});
+            _ = try stdout.print(
+                "You input {s}, a value that is not between 0 and 1.\n\n",
+                .{line.?},
+            );
             return LoopControl.again;
         },
         InputValidation.input_error => |err| {
-            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}\n\n", .{ line.?, err });
+            _ = try stdout.print(
+                "You did not input valid input [{s}]\nerror:\n{}\n\n",
+                .{ line.?, err },
+            );
             return LoopControl.again;
         },
         InputValidation.ok => |parsed_input| parsed_input,
@@ -112,7 +118,8 @@ fn validate(optional_input: ?[]const u8) InputValidation {
     const input: []const u8 = optional_input orelse return InputValidation.no_input;
     if (input.len == 0)
         return InputValidation.no_input;
-    const cost_input = std.fmt.parseFloat(f16, input) catch |err| return InputValidation{ .input_error = err };
+    const cost_input = std.fmt.parseFloat(f16, input) catch |err|
+        return InputValidation{ .input_error = err };
     if (cost_input == sentinel)
         return InputValidation{ .ok = cost_input };
     if (cost_input < 0 or cost_input > 1)
@@ -122,7 +129,13 @@ fn validate(optional_input: ?[]const u8) InputValidation {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn calculate_change(input_cost: *const f16, num_quarters: *u8, num_dimes: *u8, num_nickels: *u8, num_pennies: *u8) void {
+fn calculate_change(
+    input_cost: *const f16,
+    num_quarters: *u8,
+    num_dimes: *u8,
+    num_nickels: *u8,
+    num_pennies: *u8,
+) void {
     const cost_cents: u8 = @intFromFloat(input_cost.* * 100);
     var change: u8 = cost_cents;
 
