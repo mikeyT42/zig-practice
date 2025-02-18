@@ -96,11 +96,17 @@ fn input_loop() !LoopControl {
             return LoopControl.stop;
         },
         InputValidation.too_many => {
-            _ = try stdout.print("You input too many numbers, please only input up to {d}.\n\n", .{max_items});
+            _ = try stdout.print(
+                "You input too many numbers, please only input up to {d}.\n\n",
+                .{max_items},
+            );
             return LoopControl.again;
         },
         InputValidation.input_error => |err| {
-            _ = try stdout.print("You did not input valid input [{s}]\nerror:\n{}\n\n", .{ line.?, err });
+            _ = try stdout.print(
+                "You did not input valid input [{s}]\nerror:\n{}\n\n",
+                .{ line.?, err },
+            );
             return LoopControl.again;
         },
         InputValidation.ok => |parsed_tuple| parsed_tuple,
@@ -131,7 +137,8 @@ fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
         if (len == parsed_nums.len)
             return InputValidation.too_many;
 
-        parsed_nums[len] = std.fmt.parseFloat(f16, num) catch |err| return InputValidation{ .input_error = err };
+        parsed_nums[len] = std.fmt.parseFloat(f16, num) catch |err|
+            return InputValidation{ .input_error = err };
         len += 1;
     }
 
@@ -181,19 +188,22 @@ fn average(sums: *const Sums, counts: *const Counts, averages: *Averages) void {
     if (counts.*.positive == 0) {
         averages.*.positive = 0;
     } else {
-        averages.*.positive = @as(f32, sums.*.positive) / @as(f32, @floatFromInt(counts.*.positive));
+        averages.*.positive = @as(f32, sums.*.positive) /
+            @as(f32, @floatFromInt(counts.*.positive));
     }
 
     if (counts.*.negative == 0) {
         averages.*.negative = 0;
     } else {
-        averages.*.negative = @as(f32, sums.*.negative) / @as(f32, @floatFromInt(counts.*.negative));
+        averages.*.negative = @as(f32, sums.*.negative) /
+            @as(f32, @floatFromInt(counts.*.negative));
     }
 
     if (sums.*.overall == 0 or counts.*.overall == 0) {
         averages.*.overall = 0;
     } else {
-        averages.*.overall = @as(f32, sums.*.overall) / @as(f32, @floatFromInt(counts.*.overall));
+        averages.*.overall = @as(f32, sums.*.overall) /
+            @as(f32, @floatFromInt(counts.*.overall));
     }
 }
 
@@ -207,5 +217,18 @@ fn print_table(sums: *const Sums, counts: *const Counts, averages: *const Averag
         \\Overall:{d: >10}{d: >16.3}{d: >14.3}
         \\
         \\
-    , .{ "Number:", "Total:", "Average:", counts.*.positive, sums.*.positive, averages.*.positive, counts.*.negative, sums.*.negative, averages.*.negative, counts.*.overall, sums.*.overall, averages.*.overall });
+    , .{
+        "Number:",
+        "Total:",
+        "Average:",
+        counts.*.positive,
+        sums.*.positive,
+        averages.*.positive,
+        counts.*.negative,
+        sums.*.negative,
+        averages.*.negative,
+        counts.*.overall,
+        sums.*.overall,
+        averages.*.overall,
+    });
 }
