@@ -137,6 +137,17 @@ test validate {
         InputValidation.no_input,
         validate(" ", @constCast(&[_]f16{0} ** len)),
     );
+
+    _ = try std.testing.expectEqual(
+        InputValidation.too_many,
+        validate("1 2", &[0]f16{}),
+    );
+
+    var parsed: [2]f16 = undefined;
+    _ = try std.testing.expectEqualDeep(
+        InputValidation{ .ok = .{ @constCast(&[_]f16{ 1, 2 }), 2 } },
+        validate("1  2", &parsed),
+    );
 }
 
 fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
@@ -144,7 +155,7 @@ fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
     if (input.len == 0)
         return InputValidation.no_input;
 
-    const trimmed_input = std.mem.trim(u8, input, " ");
+    const trimmed_input = std.mem.trim(u8, input, &std.ascii.whitespace);
     var nums = std.mem.splitScalar(u8, trimmed_input, ' ');
     const peeked = nums.peek();
     if (peeked == null or std.mem.eql(u8, peeked.?, ""))
@@ -154,6 +165,8 @@ fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
     while (nums.next()) |num| {
         if (len == parsed_nums.len)
             return InputValidation.too_many;
+        if (std.mem.eql(u8, num, ""))
+            continue;
 
         parsed_nums[len] = std.fmt.parseFloat(f16, num) catch |err|
             return InputValidation{ .input_error = err };
