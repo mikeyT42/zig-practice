@@ -148,6 +148,10 @@ test validate {
         InputValidation{ .ok = .{ @constCast(&[_]f16{ 1, 2 }), 2 } },
         validate("  1  2  ", &parsed),
     );
+    _ = try std.testing.expectEqualDeep(
+        InputValidation{ .ok = .{ @constCast(&[_]f16{ 3, 4 }), 2 } },
+        validate("3 4", &parsed),
+    );
 }
 
 fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
