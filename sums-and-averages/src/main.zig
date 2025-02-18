@@ -124,6 +124,7 @@ fn input_loop() !LoopControl {
 
 // -------------------------------------------------------------------------------------------------
 test validate {
+    // No Input
     const len = comptime 10;
     _ = try std.testing.expectEqual(
         InputValidation.no_input,
@@ -137,17 +138,17 @@ test validate {
         InputValidation.no_input,
         validate(" ", @constCast(&[_]f16{0} ** len)),
     );
-
+    // Too Many
     _ = try std.testing.expectEqual(
         InputValidation.too_many,
         validate("1 2", &[0]f16{}),
     );
-
+    // Input Error
     _ = try std.testing.expectEqualDeep(
         InputValidation{ .input_error = error.InvalidCharacter },
         validate("nvim", @constCast(&[1]f16{0})),
     );
-
+    // Ok
     var parsed: [2]f16 = undefined;
     _ = try std.testing.expectEqualDeep(
         InputValidation{ .ok = .{ @constCast(&[_]f16{ 1, 2 }), 2 } },
