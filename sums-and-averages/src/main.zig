@@ -123,13 +123,31 @@ fn input_loop() !LoopControl {
 }
 
 // -------------------------------------------------------------------------------------------------
-// TODO: Make a test for the validate function.
+test validate {
+    const len = comptime 10;
+    _ = try std.testing.expectEqual(
+        InputValidation.no_input,
+        validate(null, @constCast(&[_]f16{0} ** len)),
+    );
+    _ = try std.testing.expectEqual(
+        InputValidation.no_input,
+        validate("", @constCast(&[_]f16{0} ** len)),
+    );
+    _ = try std.testing.expectEqual(
+        InputValidation.no_input,
+        validate(" ", @constCast(&[_]f16{0} ** len)),
+    );
+}
+
 fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
     const input: []const u8 = optional_input orelse return InputValidation.no_input;
     if (input.len == 0)
         return InputValidation.no_input;
-    var nums = std.mem.splitScalar(u8, input, ' ');
-    if (nums.peek() == null)
+
+    const trimmed_input = std.mem.trim(u8, input, " ");
+    var nums = std.mem.splitScalar(u8, trimmed_input, ' ');
+    const peeked = nums.peek();
+    if (peeked == null or std.mem.eql(u8, peeked.?, ""))
         return InputValidation.no_input;
 
     var len: u8 = 0;
