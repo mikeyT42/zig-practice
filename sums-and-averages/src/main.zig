@@ -143,6 +143,11 @@ test validate {
         validate("1 2", &[0]f16{}),
     );
 
+    _ = try std.testing.expectEqualDeep(
+        InputValidation{ .input_error = error.InvalidCharacter },
+        validate("nvim", @constCast(&[1]f16{0})),
+    );
+
     var parsed: [2]f16 = undefined;
     _ = try std.testing.expectEqualDeep(
         InputValidation{ .ok = .{ @constCast(&[_]f16{ 1, 2 }), 2 } },
