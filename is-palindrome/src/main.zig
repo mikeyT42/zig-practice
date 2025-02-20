@@ -125,5 +125,6 @@ fn clean_input(input: []u8) ![]u8 {
         }
     }
 
+    _ = try stdout.print("\n\ninput = {s}\n\n", .{input});
     return input[0..len];
 }
