@@ -109,7 +109,8 @@ fn clean_input(input: []u8) ![]u8 {
     );
 
     var len: u8 = 0;
-    for (input, 0..) |*character, i| {
+    var trimmed_input: []u8 = @constCast(std.mem.trim(u8, input, &std.ascii.whitespace));
+    for (trimmed_input, 0..) |*character, i| {
         _ = try stdout.print("input[i={d}] = {c}\n", .{ i, character.* });
         _ = try stdout.print("len = {d}\n", .{len});
         if (std.ascii.isAlphanumeric(character.*)) {
@@ -118,14 +119,14 @@ fn clean_input(input: []u8) ![]u8 {
             continue;
         }
 
-        for (input[i .. input.len - 1], i..) |*character_move, j| {
+        for (trimmed_input[i .. trimmed_input.len - 1], i..) |*character_move, j| {
             _ = try stdout.print("input[j={d}] = {c}\n", .{ j, character_move.* });
-            _ = try stdout.print("input[j+1={d}] = {c}\n", .{ j + 1, input[j + 1] });
-            character_move.* = input[j + 1];
-            input[j + 1] = ' ';
+            _ = try stdout.print("input[j+1={d}] = {c}\n", .{ j + 1, trimmed_input[j + 1] });
+            character_move.* = trimmed_input[j + 1];
+            trimmed_input[j + 1] = ' ';
         }
     }
 
-    _ = try stdout.print("\n\ninput = [{s}]\n\n", .{input});
-    return input[0..len];
+    _ = try stdout.print("\n\ninput = [{s}]\n\n", .{trimmed_input});
+    return trimmed_input[0..len];
 }
