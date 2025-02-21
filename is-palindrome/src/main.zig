@@ -111,10 +111,10 @@ fn clean_input(input: []u8) ![]u8 {
     var len: u8 = 0;
     for (input, 0..) |*character, i| {
         _ = try stdout.print("input[i={d}] = {c}\n", .{ i, character.* });
+        _ = try stdout.print("len = {d}\n", .{len});
         if (std.ascii.isAlphanumeric(character.*)) {
-            character.* = std.ascii.toLower(character.*);
             len += 1;
-            _ = try stdout.print("len = {d}\n", .{len});
+            character.* = std.ascii.toLower(character.*);
             continue;
         }
 
@@ -122,9 +122,10 @@ fn clean_input(input: []u8) ![]u8 {
             _ = try stdout.print("input[j={d}] = {c}\n", .{ j, character_move.* });
             _ = try stdout.print("input[j+1={d}] = {c}\n", .{ j + 1, input[j + 1] });
             character_move.* = input[j + 1];
+            input[j + 1] = ' ';
         }
     }
 
-    _ = try stdout.print("\n\ninput = {s}\n\n", .{input});
+    _ = try stdout.print("\n\ninput = [{s}]\n\n", .{input});
     return input[0..len];
 }
