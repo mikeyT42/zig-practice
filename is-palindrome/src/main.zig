@@ -108,14 +108,14 @@ fn clean_input(input: []u8) ![]u8 {
         \\
     );
 
-    var len: u8 = 0;
+    var len: usize = 0;
     var trimmed_input: []u8 = @constCast(std.mem.trim(u8, input, &std.ascii.whitespace));
     for (trimmed_input, 0..) |*character, i| {
         _ = try stdout.print("input[i={d}] = {c}\n", .{ i, character.* });
         _ = try stdout.print("len = {d}\n", .{len});
         if (std.ascii.isAlphanumeric(character.*)) {
-            len += 1;
             character.* = std.ascii.toLower(character.*);
+            len = i + 1;
             continue;
         }
 
