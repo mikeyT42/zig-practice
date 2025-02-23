@@ -50,7 +50,7 @@ fn clear() !void {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn input_loop() !void {
+fn input_loop() !LoopControl {
     const buf_len: u8 = comptime 100;
     const sentinel: u8 = comptime '\n';
 
@@ -65,6 +65,15 @@ fn input_loop() !void {
     const input = line orelse "";
     if (input.len == 0)
         return LoopControl.stop;
+
+    const cleaned_input = try clean_input(@constCast(input));
+    if (is_palindrome(cleaned_input)) {
+        _ = try stdout.print("\n\"{s}\" is a palindrome.", .{cleaned_input});
+    } else {
+        _ = try stdout.print("\n\"{s}\" is not a palindrome.", .{cleaned_input});
+    }
+
+    return LoopControl.again;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -108,7 +117,7 @@ test "clean_input no space" {
     _ = try std.testing.expect(output.len == 9);
 }
 
-fn clean_input(input: []u8) ![]u8 {
+fn clean_input(input: []u8) ![]const u8 {
     _ = try stdout.write(
         \\----
         \\Cleaning the input
@@ -140,4 +149,10 @@ fn clean_input(input: []u8) ![]u8 {
     }
 
     return trimmed_input[0..new_len];
+}
+
+// -------------------------------------------------------------------------------------------------
+fn is_palindrome(string: []const u8) bool {
+    _ = string;
+    return false;
 }
