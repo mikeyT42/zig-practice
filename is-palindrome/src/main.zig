@@ -92,6 +92,14 @@ test "clean_input space middle" {
     _ = try std.testing.expect(output.len == 9);
 }
 
+test "clean_input space double middle" {
+    var input: [11]u8 = .{ 'n', 'u', 'r', 's', 'e', 's', ' ', ' ', 'r', 'u', 'n' };
+    const output = try clean_input(&input);
+    _ = try stdout.print("[{s}]\n", .{output});
+    _ = try std.testing.expectEqualStrings("nursesrun", output);
+    _ = try std.testing.expect(output.len == 9);
+}
+
 test "clean_input no space" {
     var input: [9]u8 = .{ 'n', 'u', 'r', 's', 'e', 's', 'r', 'u', 'n' };
     const output = try clean_input(&input);
