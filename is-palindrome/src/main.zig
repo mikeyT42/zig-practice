@@ -117,12 +117,13 @@ fn clean_input(input: []u8) ![]u8 {
     );
 
     var len: usize = 0;
+    var i: usize = 0;
     var trimmed_input: []u8 = @constCast(std.mem.trim(u8, input, &std.ascii.whitespace));
-    for (trimmed_input, 0..) |*character, i| {
-        _ = try stdout.print("input[i={d}] = {c}\n", .{ i, character.* });
+    while (i < trimmed_input.len) : (i += 1) {
+        _ = try stdout.print("input[i={d}] = {c}\n", .{ i, trimmed_input[i] });
         _ = try stdout.print("len = {d}\n", .{len});
-        if (std.ascii.isAlphanumeric(character.*)) {
-            character.* = std.ascii.toLower(character.*);
+        if (std.ascii.isAlphanumeric(trimmed_input[i])) {
+            trimmed_input[i] = std.ascii.toLower(trimmed_input[i]);
             len = i + 1;
             continue;
         }
