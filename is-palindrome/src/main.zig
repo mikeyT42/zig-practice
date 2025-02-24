@@ -68,9 +68,9 @@ fn input_loop() !LoopControl {
 
     const cleaned_input = clean_input(@constCast(input));
     if (try is_palindrome(cleaned_input)) {
-        _ = try stdout.print("\n\"{s}\" is a palindrome.", .{cleaned_input});
+        _ = try stdout.print("\n\"{s}\" is a palindrome.\n\n", .{cleaned_input});
     } else {
-        _ = try stdout.print("\n\"{s}\" is not a palindrome.", .{cleaned_input});
+        _ = try stdout.print("\n\"{s}\" is not a palindrome.\n\n", .{cleaned_input});
     }
 
     return LoopControl.again;
