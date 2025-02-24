@@ -67,7 +67,7 @@ fn input_loop() !LoopControl {
         return LoopControl.stop;
 
     const cleaned_input = clean_input(@constCast(input));
-    if (is_palindrome(cleaned_input)) {
+    if (try is_palindrome(cleaned_input)) {
         _ = try stdout.print("\n\"{s}\" is a palindrome.", .{cleaned_input});
     } else {
         _ = try stdout.print("\n\"{s}\" is not a palindrome.", .{cleaned_input});
@@ -153,6 +153,10 @@ test "not a palindrome" {
     _ = try std.testing.expect(is_palindrome("hello") catch unreachable == false);
 }
 
+test "a palindrome even length" {
+    _ = try std.testing.expect(is_palindrome("noon") catch unreachable);
+}
+
 fn is_palindrome(string: []const u8) !bool {
     _ = try stdout.write(
         \\----
@@ -163,10 +167,10 @@ fn is_palindrome(string: []const u8) !bool {
 
     var i: usize = 0;
     while (i < string.len / 2) : (i += 1) {
-        _ = try stdout.print("string[{d}] = {c}\n", .{ i, string[i] });
+        _ = try stdout.print("left finger at {d} -> {c}\n", .{ i, string[i] });
         _ = try stdout.print(
-            "string[{d} - {d} - 1] = {c}\n",
-            .{ string.len, i, string[string.len - i - 1] },
+            "right finger at {d} -> {c}\n",
+            .{ string.len - i - 1, string[string.len - i - 1] },
         );
 
         if (string[i] != string[string.len - i - 1])
