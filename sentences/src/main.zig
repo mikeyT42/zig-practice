@@ -19,7 +19,7 @@ pub fn main() !void {
 
     var loop_control = LoopControl.again;
     while (loop_control == LoopControl.again) {
-        loop_control = try input_loop();
+        loop_control = try inputLoop();
     }
 
     _ = try stdout.write(
@@ -50,7 +50,7 @@ fn clear() !void {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn input_loop() !LoopControl {
+fn inputLoop() !LoopControl {
     const buf_size = comptime 250;
     const sentinel = comptime '\n';
 
@@ -64,9 +64,9 @@ fn input_loop() !LoopControl {
     const input = line.?;
     const total_keystrokes = keystrokes(input);
     _ = try stdout.print("\nKeystrokes: {d: >10}", .{total_keystrokes});
-    const total_alpha = alpha_chars(input);
+    const total_alpha = alphaChars(input);
     _ = try stdout.print("\nAlpha Characters: {d: >4}", .{total_alpha});
-    const total_digit = digit_chars(input);
+    const total_digit = digitChars(input);
     _ = try stdout.print("\nNumeric Characters: {d: >2}", .{total_digit});
     const total_vowels = vowels(input);
     _ = try stdout.print("\nVowels: {d: >14}", .{total_vowels});
@@ -85,7 +85,7 @@ test keystrokes {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn alpha_chars(input: []const u8) u8 {
+fn alphaChars(input: []const u8) u8 {
     var total_alpha: u8 = 0;
 
     for (input) |char| {
@@ -98,12 +98,12 @@ fn alpha_chars(input: []const u8) u8 {
     return total_alpha;
 }
 
-test alpha_chars {
-    _ = try std.testing.expectEqual(alpha_chars(@as([]const u8, "Hello there 12.")), 10);
+test alphaChars {
+    _ = try std.testing.expectEqual(alphaChars(@as([]const u8, "Hello there 12.")), 10);
 }
 
 // -------------------------------------------------------------------------------------------------
-fn digit_chars(input: []const u8) u8 {
+fn digitChars(input: []const u8) u8 {
     var total_digit: u8 = 0;
 
     for (input) |char| {
@@ -118,8 +118,8 @@ fn digit_chars(input: []const u8) u8 {
     return total_digit;
 }
 
-test digit_chars {
-    _ = try std.testing.expectEqual(digit_chars(@as([]const u8, "Hello there 12.")), 2);
+test digitChars {
+    _ = try std.testing.expectEqual(digitChars(@as([]const u8, "Hello there 12.")), 2);
 }
 
 // -------------------------------------------------------------------------------------------------

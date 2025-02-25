@@ -26,7 +26,7 @@ pub fn main() !void {
 
     var loop_control = LoopControl.again;
     while (loop_control == LoopControl.again) {
-        loop_control = try input_loop();
+        loop_control = try inputLoop();
     }
 
     _ = try stdout.write(
@@ -57,7 +57,7 @@ fn clear() !void {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn input_loop() !LoopControl {
+fn inputLoop() !LoopControl {
     const buf_size = comptime 250;
     const delimiter = comptime '\n';
     const sentinel = comptime -1;
@@ -98,7 +98,7 @@ fn input_loop() !LoopControl {
     var num_dimes: u8 = undefined;
     var num_nickels: u8 = undefined;
     var num_pennies: u8 = undefined;
-    calculate_change(&input_cost, &num_quarters, &num_dimes, &num_nickels, &num_pennies);
+    calculateChange(&input_cost, &num_quarters, &num_dimes, &num_nickels, &num_pennies);
 
     _ = try stdout.print(
         \\
@@ -129,7 +129,7 @@ fn validate(optional_input: ?[]const u8) InputValidation {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn calculate_change(
+fn calculateChange(
     input_cost: *const f16,
     num_quarters: *u8,
     num_dimes: *u8,

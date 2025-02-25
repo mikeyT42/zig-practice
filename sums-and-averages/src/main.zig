@@ -44,7 +44,7 @@ pub fn main() !void {
 
     var loop_control = LoopControl.again;
     while (loop_control == LoopControl.again) {
-        loop_control = try input_loop();
+        loop_control = try inputLoop();
     }
 
     _ = try stdout.write(
@@ -75,7 +75,7 @@ fn clear() !void {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn input_loop() !LoopControl {
+fn inputLoop() !LoopControl {
     const buf_size = comptime 250;
     const sentinel = comptime '\n';
     const max_items = comptime 10;
@@ -115,9 +115,9 @@ fn input_loop() !LoopControl {
     var sums: Sums = .{};
     var counts: Counts = .{};
     var averages: Averages = .{};
-    sum_and_count(numbers[0..len], &sums, &counts);
+    sumAndCount(numbers[0..len], &sums, &counts);
     average(&sums, &counts, &averages);
-    _ = try print_table(&sums, &counts, &averages);
+    _ = try printTable(&sums, &counts, &averages);
 
     return LoopControl.again;
 }
@@ -187,11 +187,11 @@ fn validate(optional_input: ?[]const u8, parsed_nums: []f16) InputValidation {
 }
 
 // -------------------------------------------------------------------------------------------------
-test sum_and_count {
+test sumAndCount {
     var sums: Sums = .{};
     var counts: Counts = .{};
     const numbers = [_]f16{ 5.0, -5.0, -5.0, 5.0 };
-    sum_and_count(&numbers, &sums, &counts);
+    sumAndCount(&numbers, &sums, &counts);
     _ = try std.testing.expect(sums.positive == 10);
     _ = try std.testing.expect(sums.negative == -10);
     _ = try std.testing.expect(sums.overall == 0);
@@ -200,7 +200,7 @@ test sum_and_count {
     _ = try std.testing.expect(counts.overall == 4);
 }
 
-fn sum_and_count(numbers: []const f16, sums: *Sums, counts: *Counts) void {
+fn sumAndCount(numbers: []const f16, sums: *Sums, counts: *Counts) void {
     for (numbers) |number| {
         if (number >= 0) {
             sums.*.positive += number;
@@ -249,7 +249,7 @@ fn average(sums: *const Sums, counts: *const Counts, averages: *Averages) void {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn print_table(sums: *const Sums, counts: *const Counts, averages: *const Averages) !void {
+fn printTable(sums: *const Sums, counts: *const Counts, averages: *const Averages) !void {
     _ = try stdout.print(
         \\  Statistics:
         \\{s: >18}{s: >16}{s: >14}

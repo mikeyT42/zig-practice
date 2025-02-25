@@ -19,7 +19,7 @@ pub fn main() !void {
 
     var loop_control = LoopControl.again;
     while (loop_control == LoopControl.again) {
-        loop_control = try input_loop();
+        loop_control = try inputLoop();
     }
 
     _ = try stdout.write(
@@ -50,7 +50,7 @@ fn clear() !void {
 }
 
 // -------------------------------------------------------------------------------------------------
-fn input_loop() !LoopControl {
+fn inputLoop() !LoopControl {
     const buf_len: u8 = comptime 100;
     const sentinel: u8 = comptime '\n';
 
@@ -66,8 +66,8 @@ fn input_loop() !LoopControl {
     if (input.len == 0)
         return LoopControl.stop;
 
-    const cleaned_input = clean_input(@constCast(input));
-    if (try is_palindrome(cleaned_input)) {
+    const cleaned_input = cleanInput(@constCast(input));
+    if (try isPalindrome(cleaned_input)) {
         _ = try stdout.print("\n\"{s}\" is a palindrome.\n\n", .{cleaned_input});
     } else {
         _ = try stdout.print("\n\"{s}\" is not a palindrome.\n\n", .{cleaned_input});
@@ -77,47 +77,47 @@ fn input_loop() !LoopControl {
 }
 
 // -------------------------------------------------------------------------------------------------
-test "clean_input space begin middle end" {
+test "cleanInput space begin middle end" {
     var input: [12]u8 = .{ ' ', 'n', 'u', 'r', 's', 'e', 's', ' ', 'r', 'u', 'n', ' ' };
-    const output = clean_input(&input);
+    const output = cleanInput(&input);
     _ = try stdout.print("[{s}]\n", .{output});
     _ = try std.testing.expectEqualStrings("nursesrun", output);
     _ = try std.testing.expect(output.len == 9);
 }
 
-test "clean_input space begin middle" {
+test "cleanInput space begin middle" {
     var input: [11]u8 = .{ ' ', 'n', 'u', 'r', 's', 'e', 's', ' ', 'r', 'u', 'n' };
-    const output = clean_input(&input);
+    const output = cleanInput(&input);
     _ = try stdout.print("[{s}]\n", .{output});
     _ = try std.testing.expectEqualStrings("nursesrun", output);
     _ = try std.testing.expect(output.len == 9);
 }
 
-test "clean_input space middle" {
+test "cleanInput space middle" {
     var input: [10]u8 = .{ 'n', 'u', 'r', 's', 'e', 's', ' ', 'r', 'u', 'n' };
-    const output = clean_input(&input);
+    const output = cleanInput(&input);
     _ = try stdout.print("[{s}]\n", .{output});
     _ = try std.testing.expectEqualStrings("nursesrun", output);
     _ = try std.testing.expect(output.len == 9);
 }
 
-test "clean_input space double middle" {
+test "cleanInput space double middle" {
     var input: [11]u8 = .{ 'n', 'u', 'r', 's', 'e', 's', ' ', ' ', 'r', 'u', 'n' };
-    const output = clean_input(&input);
+    const output = cleanInput(&input);
     _ = try stdout.print("[{s}]\n", .{output});
     _ = try std.testing.expectEqualStrings("nursesrun", output);
     _ = try std.testing.expect(output.len == 9);
 }
 
-test "clean_input no space" {
+test "cleanInput no space" {
     var input: [9]u8 = .{ 'n', 'u', 'r', 's', 'e', 's', 'r', 'u', 'n' };
-    const output = clean_input(&input);
+    const output = cleanInput(&input);
     _ = try stdout.print("[{s}]\n", .{output});
     _ = try std.testing.expectEqualStrings("nursesrun", output);
     _ = try std.testing.expect(output.len == 9);
 }
 
-fn clean_input(input: []u8) []const u8 {
+fn cleanInput(input: []u8) []const u8 {
     var trimmed_input: []u8 = @constCast(std.mem.trim(u8, input, &std.ascii.whitespace));
     var new_len: usize = 0;
     var i: usize = 0;
@@ -146,18 +146,18 @@ fn clean_input(input: []u8) []const u8 {
 
 // -------------------------------------------------------------------------------------------------
 test "a palindrome" {
-    _ = try std.testing.expect(is_palindrome("nursesrun") catch unreachable);
+    _ = try std.testing.expect(isPalindrome("nursesrun") catch unreachable);
 }
 
 test "not a palindrome" {
-    _ = try std.testing.expect(is_palindrome("hello") catch unreachable == false);
+    _ = try std.testing.expect(isPalindrome("hello") catch unreachable == false);
 }
 
 test "a palindrome even length" {
-    _ = try std.testing.expect(is_palindrome("noon") catch unreachable);
+    _ = try std.testing.expect(isPalindrome("noon") catch unreachable);
 }
 
-fn is_palindrome(string: []const u8) !bool {
+fn isPalindrome(string: []const u8) !bool {
     _ = try stdout.write(
         \\----
         \\Checking for palindrome.
