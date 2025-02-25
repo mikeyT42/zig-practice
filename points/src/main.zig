@@ -58,5 +58,22 @@ fn inputLoop() !LoopControl {
 
     var input_buf: [buf_len]u8 = undefined;
     const line = try stdin.readUntilDelimiterOrEof(&input_buf, sentinel);
-    _ = line orelse "";
+    const input = line orelse "";
+    if (input.len == 0)
+        return LoopControl.stop;
+
+    const x: ?i32, const y: ?i32 = try parseInput(input);
+    _ = x;
+    _ = y;
+}
+
+// -------------------------------------------------------------------------------------------------
+fn parseInput(input: []const u8) !?struct { i32, i32 } {
+    var split_input = std.mem.splitScalar(u8, input, ' ');
+    var i: usize = 0;
+    while (split_input.next()) |split| : (i += 1) {
+        if (i == 2)
+            break;
+        _ = split;
+    }
 }
