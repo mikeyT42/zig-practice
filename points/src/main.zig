@@ -70,6 +70,11 @@ fn inputLoop() !LoopControl {
 // -------------------------------------------------------------------------------------------------
 test parseInput {
     try std.testing.expectEqual(.{ 1, 2 }, parseInput("1 2"));
+    try std.testing.expectEqual(.{ 1, 2 }, parseInput("1  2"));
+    try std.testing.expectEqual(.{ 1, 2 }, parseInput(" 1  2 "));
+    try std.testing.expectEqual(null, parseInput(""));
+    try std.testing.expectEqual(null, parseInput("1 2 3"));
+    try std.testing.expectError(std.fmt.ParseIntError.InvalidCharacter, parseInput("1 ;kladsf"));
 }
 
 fn parseInput(input: []const u8) !?struct { i32, i32 } {
@@ -87,5 +92,9 @@ fn parseInput(input: []const u8) !?struct { i32, i32 } {
         number_of_ints += 1;
     }
 
-    return .{ point[0], point[1] };
+    if (number_of_ints < 2) {
+        return null;
+    } else {
+        return .{ point[0], point[1] };
+    }
 }
