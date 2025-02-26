@@ -62,9 +62,17 @@ fn inputLoop() !LoopControl {
     if (input.len == 0)
         return LoopControl.stop;
 
-    const x: ?i32, const y: ?i32 = try parseInput(input);
+    const parsed_tuple = try parseInput(input);
+    if (parsed_tuple == null) {
+        _ = try stdout.write("You did not enter 2 valid integers to create a point. Try again.\n");
+        return LoopControl.again;
+    }
+
+    const x, const y = parsed_tuple.?;
     _ = x;
     _ = y;
+
+    return LoopControl.again;
 }
 
 // -------------------------------------------------------------------------------------------------
