@@ -1,10 +1,16 @@
 const std = @import("std");
 const stdout = std.io.getStdOut().writer();
+const stderr = std.io.getStdErr().writer();
 const stdin = std.io.getStdIn().reader();
 
 const LoopControl = enum {
     again,
     stop,
+};
+
+const Point = struct {
+    x: i32,
+    y: i32,
 };
 
 pub fn main() !void {
@@ -105,4 +111,23 @@ fn parseInput(input: []const u8) !?struct { i32, i32 } {
     } else {
         return .{ point[0], point[1] };
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+test createPoint {
+    const result = createPoint(std.testing.allocator, 1, 2);
+    try std.testing.expect(result.?.*.x == 1 and result.?.*.y == 2);
+}
+
+/// Caller owns returned Point memory.
+fn createPoint(allocator: std.mem.Allocator, x: i32, y: i32) ?*Point {
+    const point = allocator.create(Point) catch |err| {
+        stderr.print("Could not create a Point.\n{}", .{err}) catch unreachable;
+        return null;
+    };
+
+    point.x = x;
+    point.y = y;
+
+    return point;
 }
