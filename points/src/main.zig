@@ -115,15 +115,22 @@ fn parseInput(input: []const u8) !?struct { i32, i32 } {
 
 // -------------------------------------------------------------------------------------------------
 test createPoint {
-    const result = createPoint(std.testing.allocator, 1, 2);
-    try std.testing.expect(result.?.*.x == 1 and result.?.*.y == 2);
+    const allocator = std.testing.allocator;
+    var result = try createPoint(allocator, 1, 2);
+    defer allocator.destroy(result);
+    try std.testing.expect(result.*.x == 1 and result.*.y == 2);
+
+    const failing_allocator = std.testing.failing_allocator;
+    result = try createPoint(failing_allocator, 1, 2);
+    defer failing_allocator.destroy(result);
+    try std.testing.expect(result == null);
 }
 
 /// Caller owns returned Point memory.
-fn createPoint(allocator: std.mem.Allocator, x: i32, y: i32) ?*Point {
+fn createPoint(allocator: std.mem.Allocator, x: i32, y: i32) !*Point {
     const point = allocator.create(Point) catch |err| {
         stderr.print("Could not create a Point.\n{}", .{err}) catch unreachable;
-        return null;
+        return err;
     };
 
     point.x = x;
