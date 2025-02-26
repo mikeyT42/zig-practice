@@ -68,12 +68,24 @@ fn inputLoop() !LoopControl {
 }
 
 // -------------------------------------------------------------------------------------------------
+test parseInput {
+    try std.testing.expectEqual(.{ 1, 2 }, parseInput("1 2"));
+}
+
 fn parseInput(input: []const u8) !?struct { i32, i32 } {
     var split_input = std.mem.splitScalar(u8, input, ' ');
-    var i: usize = 0;
-    while (split_input.next()) |split| : (i += 1) {
-        if (i == 2)
-            break;
-        _ = split;
+    var point: [2]i32 = undefined;
+    var number_of_ints: usize = 0;
+    while (split_input.next()) |split| {
+        if (split.len == 0)
+            continue;
+
+        if (number_of_ints == 2)
+            return null;
+
+        point[number_of_ints] = try std.fmt.parseInt(i32, split, 10);
+        number_of_ints += 1;
     }
+
+    return .{ point[0], point[1] };
 }
