@@ -80,6 +80,7 @@ fn inputLoop() !LoopControl {
     const allocator = arena.allocator();
 
     const point = createPoint(allocator, x, y) catch return LoopControl.again;
+    _ = point;
 
     return LoopControl.again;
 }
@@ -137,8 +138,36 @@ fn createPoint(allocator: std.mem.Allocator, x: i32, y: i32) !*Point {
         return err;
     };
 
-    point.x = x;
-    point.y = y;
+    point.*.x = x;
+    point.*.y = y;
 
     return point;
+}
+
+// -------------------------------------------------------------------------------------------------
+test "toString successfully" {
+    const allocator = std.testing.allocator;
+    const point = try toString(allocator, &Point{ .x = 1, .y = 2 });
+    defer allocator.free(point);
+    try std.testing.expectEqualStrings(
+        \\point {
+        \\    x = 1
+        \\    y = 2
+        \\}
+        \\
+    , point);
+}
+
+/// Caller owns returned string memory.
+fn toString(allocator: std.mem.Allocator, point: *const Point) ![]u8 {
+    return std.fmt.allocPrint(allocator,
+        \\point {{
+        \\{c: >5} = {d}
+        \\{c: >5} = {d}
+        \\}}
+        \\
+    , .{ 'x', point.*.x, 'y', point.*.y }) catch |err| {
+        stderr.print("Could not create a point string.\n{}\n", .{err}) catch unreachable;
+        return err;
+    };
 }
