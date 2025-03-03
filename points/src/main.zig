@@ -75,12 +75,13 @@ fn inputLoop() !LoopControl {
     }
     const x, const y = parsed_tuple.?;
 
-    const arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
-
     const point = createPoint(allocator, x, y) catch return LoopControl.again;
-    _ = point;
+    const point_string = toString(allocator, point) catch return LoopControl.again;
+
+    _ = try stdout.print("\n{s}\n\n", .{point_string});
 
     return LoopControl.again;
 }
@@ -156,6 +157,12 @@ test "toString successfully" {
         \\}
         \\
     , point);
+}
+
+test "toString unsuccessfully" {
+    const allocator = std.testing.failing_allocator;
+    const result = toString(allocator, &Point{ .x = 1, .y = 2 });
+    try std.testing.expectError(error.OutOfMemory, result);
 }
 
 /// Caller owns returned string memory.
