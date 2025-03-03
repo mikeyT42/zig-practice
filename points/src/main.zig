@@ -68,7 +68,7 @@ fn inputLoop() !LoopControl {
     if (input.len == 0)
         return LoopControl.stop;
 
-    const parsed_tuple = try parseInput(input);
+    const parsed_tuple = parseInput(input) catch null;
     if (parsed_tuple == null) {
         _ = try stdout.write("You did not enter 2 valid integers to create a point. Try again.\n");
         return LoopControl.again;
@@ -103,7 +103,6 @@ fn parseInput(input: []const u8) !?struct { i32, i32 } {
     while (split_input.next()) |split| {
         if (split.len == 0)
             continue;
-
         if (number_of_ints == 2)
             return null;
 
