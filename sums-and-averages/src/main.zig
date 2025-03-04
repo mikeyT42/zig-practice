@@ -203,14 +203,14 @@ test sumAndCount {
 fn sumAndCount(numbers: []const f16, sums: *Sums, counts: *Counts) void {
     for (numbers) |number| {
         if (number >= 0) {
-            sums.*.positive += number;
-            counts.*.positive += 1;
+            sums.positive += number;
+            counts.positive += 1;
         } else {
-            sums.*.negative += number;
-            counts.*.negative += 1;
+            sums.negative += number;
+            counts.negative += 1;
         }
-        sums.*.overall += number;
-        counts.*.overall += 1;
+        sums.overall += number;
+        counts.overall += 1;
     }
 }
 
@@ -226,25 +226,25 @@ test average {
 }
 
 fn average(sums: *const Sums, counts: *const Counts, averages: *Averages) void {
-    if (counts.*.positive == 0) {
-        averages.*.positive = 0;
+    if (counts.positive == 0) {
+        averages.positive = 0;
     } else {
-        averages.*.positive = @as(f32, sums.*.positive) /
-            @as(f32, @floatFromInt(counts.*.positive));
+        averages.positive = @as(f32, sums.positive) /
+            @as(f32, @floatFromInt(counts.positive));
     }
 
-    if (counts.*.negative == 0) {
-        averages.*.negative = 0;
+    if (counts.negative == 0) {
+        averages.negative = 0;
     } else {
-        averages.*.negative = @as(f32, sums.*.negative) /
-            @as(f32, @floatFromInt(counts.*.negative));
+        averages.negative = @as(f32, sums.negative) /
+            @as(f32, @floatFromInt(counts.negative));
     }
 
-    if (sums.*.overall == 0 or counts.*.overall == 0) {
-        averages.*.overall = 0;
+    if (sums.overall == 0 or counts.overall == 0) {
+        averages.overall = 0;
     } else {
-        averages.*.overall = @as(f32, sums.*.overall) /
-            @as(f32, @floatFromInt(counts.*.overall));
+        averages.overall = @as(f32, sums.overall) /
+            @as(f32, @floatFromInt(counts.overall));
     }
 }
 
@@ -262,14 +262,14 @@ fn printTable(sums: *const Sums, counts: *const Counts, averages: *const Average
         "Number:",
         "Total:",
         "Average:",
-        counts.*.positive,
-        sums.*.positive,
-        averages.*.positive,
-        counts.*.negative,
-        sums.*.negative,
-        averages.*.negative,
-        counts.*.overall,
-        sums.*.overall,
-        averages.*.overall,
+        counts.positive,
+        sums.positive,
+        averages.positive,
+        counts.negative,
+        sums.negative,
+        averages.negative,
+        counts.overall,
+        sums.overall,
+        averages.overall,
     });
 }

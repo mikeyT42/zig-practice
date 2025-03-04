@@ -138,8 +138,8 @@ fn createPoint(allocator: std.mem.Allocator, x: i32, y: i32) !*Point {
         return err;
     };
 
-    point.*.x = x;
-    point.*.y = y;
+    point.x = x;
+    point.y = y;
 
     return point;
 }
@@ -172,7 +172,7 @@ fn toString(allocator: std.mem.Allocator, point: *const Point) ![]u8 {
         \\{c: >5} = {d}
         \\}}
         \\
-    , .{ 'x', point.*.x, 'y', point.*.y }) catch |err| {
+    , .{ 'x', point.x, 'y', point.y }) catch |err| {
         stderr.print("Could not create a point string.\n{}\n", .{err}) catch unreachable;
         return err;
     };
