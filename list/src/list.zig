@@ -1,3 +1,3 @@
-const List = struct {
+pub const List = struct {
     capacity: usize,
 };
