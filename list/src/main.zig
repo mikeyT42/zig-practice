@@ -1,4 +1,5 @@
 const std = @import("std");
+const list = @import("./list.zig");
 const stdout = std.io.getStdOut().writer();
 const stderr = std.io.getStdErr().writer();
 const stdin = std.io.getStdIn().reader();
