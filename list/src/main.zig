@@ -1,5 +1,5 @@
 const std = @import("std");
-const list_lib = @import("./list.zig");
+const List = @import("./list.zig").List;
 const stdout = std.io.getStdOut().writer();
 const stderr = std.io.getStdErr().writer();
 const stdin = std.io.getStdIn().reader();
@@ -14,7 +14,7 @@ pub fn main() !void {
         \\
     );
 
-    const list: list_lib.List = .{ .capacity = 10 };
+    const list: List = .{ .capacity = 10 };
     _ = list;
 
     _ = try stdout.write(
