@@ -42,7 +42,7 @@ pub const List = struct {
     pub fn destroy(self: *Self) void {
         self.allocator.free(self.data);
         self.len = 0;
-        //self.data.len = 0; I may not need to do this.
+        self.data.len = 0;
     }
 };
 
@@ -57,4 +57,13 @@ test "List creation and deletion" {
     defer list.destroy();
     _ = try std.testing.expectEqual(0, list.len);
     _ = try std.testing.expectEqual(growth_factor, list.data.len);
+}
+
+// -------------------------------------------------------------------------------------------------
+test "List creation and deletion emphasized" {
+    const allocator = std.testing.allocator;
+    var list = try List.create(allocator);
+    list.destroy();
+    _ = try std.testing.expectEqual(0, list.len);
+    _ = try std.testing.expectEqual(0, list.data.len);
 }
