@@ -12,7 +12,7 @@ pub const List = struct {
     //
     // =============================================================================================
     ///This should not be written to by anyone outside.
-    capacity: usize,
+    len: usize,
     ///The dynamically allocated array.
     data: []i32,
     allocator: std.mem.Allocator,
@@ -30,18 +30,31 @@ pub const List = struct {
         };
 
         const list = Self{
-            .capacity = 0,
+            .len = 0,
             .allocator = allocator,
             .data = data,
         };
-        _ = stdout.write("List created.\n");
+        _ = stdout.write("List created.\n") catch unreachable;
         return list;
     }
 
     // ---------------------------------------------------------------------------------------------
     pub fn destroy(self: *Self) void {
         self.allocator.free(self.data);
-        self.capacity = 0;
+        self.len = 0;
         //self.data.len = 0; I may not need to do this.
     }
 };
+
+// =================================================================================================
+//
+//      Tests
+//
+// =================================================================================================
+test "List creation and deletion" {
+    const allocator = std.testing.allocator;
+    var list = try List.create(allocator);
+    defer list.destroy();
+    _ = try std.testing.expectEqual(0, list.len);
+    _ = try std.testing.expectEqual(growth_factor, list.data.len);
+}
