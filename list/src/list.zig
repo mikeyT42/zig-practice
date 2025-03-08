@@ -51,6 +51,26 @@ pub const List = struct {
         self.len -= 1;
         return i;
     }
+
+    // ---------------------------------------------------------------------------------------------
+    pub fn put(self: *Self, i: i32) std.mem.Allocator.Error!void {
+        _ = stdout.print(
+            "length = {d} ; capacity = {}\n",
+            .{ self.len, self.data.len },
+        ) catch unreachable;
+
+        if (self.len >= self.data.len) {
+            _ = stdout.write("Reallocating.\n") catch unreachable;
+            const new_array_size = growth_factor + self.data.len;
+            self.data = self.allocator.realloc(self.data, new_array_size) catch |err| {
+                _ = stderr.write("\n\nCould not realloc data in List.\n\n") catch unreachable;
+                return err;
+            };
+        }
+
+        self.len += 1;
+        self.data[self.len - 1] = i;
+    }
 };
 
 // =================================================================================================
@@ -73,4 +93,22 @@ test "List creation and deletion emphasized" {
     list.destroy();
     _ = try std.testing.expectEqual(0, list.len);
     _ = try std.testing.expectEqual(0, list.data.len);
+}
+
+// -------------------------------------------------------------------------------------------------
+test "List put" {
+    const allocator = std.testing.allocator;
+    var list = try List.create(allocator);
+    defer list.destroy();
+    for (0..9) |i| {
+        _ = try stdout.print("i = {}\n", .{i + 1});
+        try list.put(@intCast(i + 1));
+    }
+    _ = try stdout.print("i = {}\n", .{10});
+    try list.put(10);
+    _ = try stdout.print("i = {}\n", .{11});
+    try list.put(11);
+
+    _ = try std.testing.expectEqual(20, list.data.len);
+    _ = try std.testing.expectEqual(11, list.len);
 }
