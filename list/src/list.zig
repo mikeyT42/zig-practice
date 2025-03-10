@@ -83,18 +83,18 @@ pub const List = struct {
             .{ self.len, self.data.len },
         ) catch unreachable;
 
-        if (can_reduce_size) {
-            const new_array_size = self.len;
-            _ = stdout.print("new_array_size = {d}\n", .{new_array_size}) catch unreachable;
-            self.data = self.allocator.realloc(self.data, new_array_size) catch |err| {
-                _ = stderr.write("\n\nCould not realloc data in List.\n\n") catch unreachable;
-                return err;
-            };
-            _ = stdout.print(
-                "length = {d} ; capacity = {d}\n",
-                .{ self.len, self.data.len },
-            ) catch unreachable;
-        }
+        if (!can_reduce_size) return;
+
+        const new_array_size = self.len;
+        _ = stdout.print("new_array_size = {d}\n", .{new_array_size}) catch unreachable;
+        self.data = self.allocator.realloc(self.data, new_array_size) catch |err| {
+            _ = stderr.write("\n\nCould not realloc data in List.\n\n") catch unreachable;
+            return err;
+        };
+        _ = stdout.print(
+            "length = {d} ; capacity = {d}\n",
+            .{ self.len, self.data.len },
+        ) catch unreachable;
     }
 };
 
