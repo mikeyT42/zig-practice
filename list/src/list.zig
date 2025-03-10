@@ -71,6 +71,31 @@ pub const List = struct {
         self.len += 1;
         self.data[self.len - 1] = i;
     }
+
+    // ---------------------------------------------------------------------------------------------
+    pub fn shrinkToFit(self: *Self) std.mem.Allocator.Error!void {
+        const diff = self.data.len - self.len;
+        const can_reduce_size = diff > 0;
+        _ = stdout.print("diff = {}\n", .{diff}) catch unreachable;
+        _ = stdout.print("can_reduce_size = {}\n", .{can_reduce_size}) catch unreachable;
+        _ = stdout.print(
+            "length = {} ; capacity = {}\n",
+            .{ self.len, self.data.len },
+        ) catch unreachable;
+
+        if (can_reduce_size) {
+            const new_array_size = self.len;
+            _ = stdout.print("new_array_size = {d}\n", .{new_array_size}) catch unreachable;
+            self.data = self.allocator.realloc(self.data, new_array_size) catch |err| {
+                _ = stderr.write("\n\nCould not realloc data in List.\n\n") catch unreachable;
+                return err;
+            };
+            _ = stdout.print(
+                "length = {d} ; capacity = {d}\n",
+                .{ self.len, self.data.len },
+            ) catch unreachable;
+        }
+    }
 };
 
 // =================================================================================================
@@ -111,4 +136,40 @@ test "List put" {
 
     _ = try std.testing.expectEqual(20, list.data.len);
     _ = try std.testing.expectEqual(11, list.len);
+}
+
+// -------------------------------------------------------------------------------------------------
+test "List pop" {
+    const allocator = std.testing.allocator;
+    var list = try List.create(allocator);
+    defer list.destroy();
+    for (0..11) |i| {
+        _ = try stdout.print("i = {}\n", .{i + 1});
+        try list.put(@intCast(i + 1));
+    }
+
+    _ = try std.testing.expectEqual(11, list.len);
+    const popped = list.pop();
+
+    _ = try std.testing.expectEqual(20, list.data.len);
+    _ = try std.testing.expectEqual(10, list.len);
+    _ = try std.testing.expectEqual(11, popped);
+}
+
+// -------------------------------------------------------------------------------------------------
+test "List shrinkToFit" {
+    const allocator = std.testing.allocator;
+    var list = try List.create(allocator);
+    defer list.destroy();
+    for (0..12) |i| {
+        _ = try stdout.print("i = {}\n", .{i + 1});
+        try list.put(@intCast(i + 1));
+    }
+
+    _ = try std.testing.expectEqual(20, list.data.len);
+    _ = try std.testing.expectEqual(12, list.len);
+
+    try list.shrinkToFit();
+    _ = try std.testing.expectEqual(12, list.data.len);
+    _ = try std.testing.expectEqual(12, list.len);
 }
