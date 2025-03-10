@@ -15,6 +15,7 @@ pub const List = struct {
     len: usize,
     ///The dynamically allocated array.
     data: []i32,
+    ///The caller is responsible to destroy() the List instance.
     allocator: std.mem.Allocator,
 
     // =============================================================================================
