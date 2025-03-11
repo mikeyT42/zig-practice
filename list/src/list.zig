@@ -63,6 +63,7 @@ pub const List = struct {
         if (self.len >= self.data.len) {
             _ = stdout.write("Reallocating.\n") catch unreachable;
             const new_array_size = growth_factor + self.data.len;
+            _ = stdout.print("new_array_size = {}\n", .{new_array_size}) catch unreachable;
             self.data = self.allocator.realloc(self.data, new_array_size) catch |err| {
                 _ = stderr.write("\n\nCould not realloc data in List.\n\n") catch unreachable;
                 return err;

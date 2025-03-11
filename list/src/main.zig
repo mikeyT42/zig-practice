@@ -17,18 +17,21 @@ pub fn main() !void {
         \\-----------------------------------------------------------------------
         \\                          Creating the List
         \\-----------------------------------------------------------------------
+        \\
+        \\
     );
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
     var list = try List.create(allocator);
-    defer list.destroy();
     _ = try stdout.print("List length = {d}\n", .{list.len});
 
     _ = try stdout.write(
         \\-----------------------------------------------------------------------
         \\                          Filling the List
         \\-----------------------------------------------------------------------
+        \\
+        \\
     );
     try list.put(1);
     try list.put(2);
@@ -40,9 +43,94 @@ pub fn main() !void {
     try list.put(8);
     try list.put(9);
     _ = try stdout.print("List length = {d}\n", .{list.len});
-    for (list.data, 0..) |item, i| {
+    for (list.data[0..list.len], 0..) |item, i| {
         _ = try stdout.print("item at {d} = {d}\n", .{ i, item });
     }
+
+    try list.put(10);
+    _ = try stdout.print("List length = {d}\n", .{list.len});
+    for (list.data[0..list.len], 0..) |item, i| {
+        _ = try stdout.print("item at {d} = {d}\n", .{ i, item });
+    }
+    try list.shrinkToFit();
+
+    _ = try stdout.write(
+        \\-----------------------------------------------------------------------
+        \\                          First Reallocation
+        \\-----------------------------------------------------------------------
+        \\
+        \\
+    );
+    try list.put(11);
+    _ = try stdout.print("List length = {d}\n", .{list.len});
+    for (list.data[0..list.len], 0..) |item, i| {
+        _ = try stdout.print("item at {d} = {d}\n", .{ i, item });
+    }
+
+    try list.put(12);
+    try list.put(13);
+    try list.put(14);
+    try list.put(15);
+    try list.put(16);
+    try list.put(17);
+    try list.put(18);
+    try list.put(19);
+    try list.put(20);
+
+    _ = try stdout.write(
+        \\-----------------------------------------------------------------------
+        \\                          Second Reallocation
+        \\-----------------------------------------------------------------------
+        \\
+        \\
+    );
+    try list.put(21);
+    try list.put(22);
+    try list.put(23);
+    try list.put(24);
+    try list.put(25);
+    try list.put(26);
+    try list.put(27);
+    try list.put(28);
+    try list.put(29);
+    try list.put(30);
+
+    _ = try stdout.write(
+        \\-----------------------------------------------------------------------
+        \\                          Third Reallocation
+        \\-----------------------------------------------------------------------
+        \\
+        \\
+    );
+    try list.put(31);
+    try list.put(32);
+    try list.put(33);
+    _ = try stdout.print("List length = {d}\n", .{list.len});
+    for (list.data[0..list.len], 0..) |item, i| {
+        _ = try stdout.print("item at {d} = {d}\n", .{ i, item });
+    }
+
+    _ = try stdout.write(
+        \\-----------------------------------------------------------------------
+        \\                          Removing and Shrinking
+        \\-----------------------------------------------------------------------
+        \\
+        \\
+    );
+    const popped = list.pop();
+    _ = try stdout.print("Popped = {d}\n", .{popped});
+    _ = list.pop();
+    _ = list.pop();
+    try list.shrinkToFit();
+
+    _ = try stdout.write(
+        \\-----------------------------------------------------------------------
+        \\                          Destroying
+        \\-----------------------------------------------------------------------
+        \\
+        \\
+    );
+    list.destroy();
 
     _ = try stdout.write(
         \\
