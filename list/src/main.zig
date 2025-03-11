@@ -13,6 +13,36 @@ pub fn main() !void {
         \\
         \\
     );
+    _ = try stdout.write(
+        \\-----------------------------------------------------------------------
+        \\                          Creating the List
+        \\-----------------------------------------------------------------------
+    );
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+    var list = try List.create(allocator);
+    defer list.destroy();
+    _ = try stdout.print("List length = {d}\n", .{list.len});
+
+    _ = try stdout.write(
+        \\-----------------------------------------------------------------------
+        \\                          Filling the List
+        \\-----------------------------------------------------------------------
+    );
+    try list.put(1);
+    try list.put(2);
+    try list.put(3);
+    try list.put(4);
+    try list.put(5);
+    try list.put(6);
+    try list.put(7);
+    try list.put(8);
+    try list.put(9);
+    _ = try stdout.print("List length = {d}\n", .{list.len});
+    for (list.data, 0..) |item, i| {
+        _ = try stdout.print("item at {d} = {d}\n", .{ i, item });
+    }
 
     _ = try stdout.write(
         \\
