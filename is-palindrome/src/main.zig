@@ -11,7 +11,7 @@ pub fn main() !void {
     try clear();
     _ = try stdout.write(
         \\------------------------------------------------------------------------------------------
-        \\                              Welcome the Point Inputter
+        \\                            Welcome to the Palindrome Checker
         \\------------------------------------------------------------------------------------------
         \\
         \\
@@ -55,7 +55,7 @@ fn inputLoop() !LoopControl {
     const sentinel: u8 = comptime '\n';
 
     _ = try stdout.write(
-        \\Please enter a string that is a palindrome; if you want to exit then then just hit enter.
+        \\Please enter a string that is a palindrome; if you want to exit then just hit enter.
         \\It can be a sentence or a word.
         \\
     );
